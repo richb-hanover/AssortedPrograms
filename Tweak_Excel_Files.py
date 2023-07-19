@@ -1,6 +1,7 @@
 
 # Thanks, ChatGPT!
 # https://chat.openai.com/c/61bf6d71-67b2-4a1f-b5b0-7ecb3292b699
+# Getting close 
 
 import os
 from openpyxl import load_workbook
