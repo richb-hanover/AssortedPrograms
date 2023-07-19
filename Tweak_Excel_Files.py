@@ -1,7 +1,7 @@
 
 # Thanks, ChatGPT!
 # https://chat.openai.com/c/61bf6d71-67b2-4a1f-b5b0-7ecb3292b699
-# Getting close 
+# Getting close
 
 import os
 from openpyxl import load_workbook
@@ -50,26 +50,39 @@ for file_name in excel_files:
     # Set cell A1 to be left-adjusted
     first_sheet['A1'].alignment = Alignment(horizontal='left')
    
-    # Change the font to Calibri 12 for all sheets
-    font = Font(name='Calibri', size=12)
+    # Change the font to Calibri 14 for all sheets
+    font = Font(name='Calibri', size=14)
+    first_sheet.sheet_format.defaultRowHeight = 100
     for sheet in workbook.worksheets:
         for column in sheet.columns:
             for cell in column:
                 cell.font = font
+    
+    # Iterate over all rows and set the row height to autofit
+    for row in first_sheet.iter_rows():
+        for cell in row:
+            if cell.value:
+                cell.alignment = cell.alignment.copy(wrapText=False)
+        first_sheet.row_dimensions[row[0].row].height = None
 
     # Convert all numbers to currency format
     for sheet in workbook.worksheets:
         for row in sheet.iter_rows():
+            #rh = sheet.row_dimensions[row].height
+            # print(row)
             # sheet.row_dimensions[row].height = 100
             for cell in row:
+                # sheet.row_dimensions[row].height = 100
                 # if isinstance(cell.value, (int, float)):
                     # Set the number format to currency with no decimal places
-                cell.number_format = '$#,##0'
+                cell.number_format = '#,##0'
     
-                    # Convert negative numbers to parentheses format
-                if isinstance(cell.value, (int, float)):
-                    if cell.value < 0:
-                        cell.number_format = '($#,##0)'
+                # Convert negative numbers to parentheses format
+                # DOESN'T WORK: Gives -($500)
+                # Just fix manually
+                # if isinstance(cell.value, (int, float)):
+                #     if cell.value < 0:
+                #         cell.number_format = '($#,##0)'
                         
     # Save the modified workbook
     modified_file_path = os.path.join(folder_path, f"modified_{name_without_extension}.xlsx")
