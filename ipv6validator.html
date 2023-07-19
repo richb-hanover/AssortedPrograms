@@ -1,0 +1,616 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>
+	Dartware : IPV6-Validator
+</title>
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" href="/library/styles/client.css" />
+<link rel="stylesheet" type="text/css" href="/library/styles/master.css" />
+<link rel="stylesheet" type="text/css" href="/library/styles/topNav.css" />
+<link rel="stylesheet" type="text/css" href="/fancybox/jquery.fancybox-1.3.1.css" />
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="/library/javascript/jquery.cycle.min.js"></script>
+<script type="text/javascript" src="/library/javascript/topNav.js"></script>
+
+<script type="text/javascript" src="/library/javascript/jquery-hover.js"></script>
+<script type="text/javascript" src="/library/javascript/curvy-corners.js"></script>
+<script type="text/javascript" src="/library/javascript/scripts.js"></script>
+<script type="text/javascript" src="/library/javascript/popup.js"></script>
+<script type="text/javascript" src="/fancybox/jquery.fancybox-1.3.1.js"></script>
+
+<script type="text/javascript">            
+$(document).ready( function(){
+    $("[rel=photo_gallery]").fancybox({
+        'titleShow': true,
+        'transitionIn': 'none',
+        'transitionOut': 'elastic',
+        'titlePosition': 'over',
+        'titleFormat': function (title, currentArray, currentIndex, currentOpts) {
+            return '<span id="fancybox-title-over">Image ' + (currentIndex + 1) + ' / ' + currentArray.length + (title.length ? ' &nbsp; ' + title : '') + '</span>';
+        },
+        'thumbMinWidth': 100
+    });
+
+    $(".toggle_container").hide();
+				   
+	$("a.trigger").click(function(){
+					$(this).next(".toggle_container").slideToggle("slow,");
+	});
+});
+
+function ClosePopupContent() {
+    $("#fancybox-close").trigger('click');
+}
+
+
+function stopRKey(evt) {
+    var evt = (evt) ? evt : ((event) ? event : null);
+    var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
+    if ((evt.keyCode == 13) && (node.type == "text" || node.type == "password" || node.type == "select-one")) {
+        if (node.getAttribute("submitButtonID") != null) {
+            var submitButtonID = node.getAttribute("submitButtonID");
+            if ((submitButtonID != null) && (submitButtonID != "")) {
+                $("#" + submitButtonID).click();
+            }
+        }
+        return false;
+    }
+}
+document.onkeypress = stopRKey;
+function NoSubmitPostBack() {
+    var formNameFld = document.getElementById('formName');
+    if (formNameFld != null) {
+        formNameFld.value = 'NoSubmitPostBack';
+    }
+}
+</script>
+ <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-784209-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>   
+<meta name="keywords" content="Dartware " /><meta name="description" content="Dartware " /></head>
+
+<body>
+
+
+<form method="post" action="IPV6-Validator.aspx" id="thisForm">
+<div class="aspNetHidden">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTE5ODkyNTgyNTAPZBYCZg9kFgICAQ9kFgICBw9kFg4CAw9kFgYCBw8WAh4Oc3VibWl0QnV0dG9uSUQFEmN0bDA1X3NlYXJjaEJ1dHRvbmQCCQ8PFgIeDU9uQ2xpZW50Q2xpY2sFE05vU3VibWl0UG9zdEJhY2soKTtkZAILD2QWCgIBD2QWAmYPFgIeBGhyZWYFCi9wcm9kdWN0cy9kAgIPZBYCZg8WAh8CBQsvc29sdXRpb25zL2QCAw9kFgJmDxYCHwIFCy9yZXNvdXJjZXMvZAIED2QWAmYPFgIfAgUJL3N1cHBvcnQvZAIFD2QWAmYPFgIfAgUQL2ZyZWUtdHJpYWwuYXNweGQCBQ9kFgQCAQ8PFgIeB1Zpc2libGVoZGQCAw8PFgIfA2hkZAITD2QWAgIBDw8WAh4EVGV4dAUEMjAxMWRkAhcPZBYCZg9kFgICAQ8WAh4LXyFJdGVtQ291bnQCAxYGZg9kFggCAQ9kFgJmDxUDFi9wcm9kdWN0cy9pbnRlcm1hcHBlci8AC0ludGVyTWFwcGVyZAIDD2QWAmYPFQQWL3Byb2R1Y3RzL2ludGVybWFwcGVyLwtpbnRlcm1hcHBlcgALSW50ZXJNYXBwZXJkAgUPZBYCZg8VAwtpbnRlcm1hcHBlcgALSW50ZXJNYXBwZXJkAgcPFgIfBQIDFgZmD2QWBgIBD2QWAmYPFQMWL3Byb2R1Y3RzL2ludGVybWFwcGVyLwAIRmVhdHVyZXNkAgMPZBYCZg8VBBYvcHJvZHVjdHMvaW50ZXJtYXBwZXIvDWZlYXR1cmVzLmFzcHgACEZlYXR1cmVzZAIFD2QWAmYPFQMNZmVhdHVyZXMuYXNweAAIRmVhdHVyZXNkAgEPZBYGAgEPZBYCZg8VAxYvcHJvZHVjdHMvaW50ZXJtYXBwZXIvABFXaGF0J3MgTmV3IGluIDUuNGQCAw9kFgJmDxUEFi9wcm9kdWN0cy9pbnRlcm1hcHBlci8Od2hhdHMtbmV3LmFzcHgAEVdoYXQncyBOZXcgaW4gNS40ZAIFD2QWAmYPFQMOd2hhdHMtbmV3LmFzcHgAEVdoYXQncyBOZXcgaW4gNS40ZAICD2QWBgIBD2QWAmYPFQMWL3Byb2R1Y3RzL2ludGVybWFwcGVyLwAUQ3VzdG9tZXIgTWFwIEdhbGxlcnlkAgMPZBYCZg8VBBYvcHJvZHVjdHMvaW50ZXJtYXBwZXIvGWN1c3RvbWVyLW1hcC1nYWxsZXJ5LmFzcHgAFEN1c3RvbWVyIE1hcCBHYWxsZXJ5ZAIFD2QWAmYPFQMZY3VzdG9tZXItbWFwLWdhbGxlcnkuYXNweAAUQ3VzdG9tZXIgTWFwIEdhbGxlcnlkAgEPZBYIAgEPZBYCZg8VAyMvcHJvZHVjdHMvaW50ZXJtYXBwZXItcmVtb3RlYWNjZXNzLwAYSW50ZXJNYXBwZXIgUmVtb3RlQWNjZXNzZAIDD2QWAmYPFQQjL3Byb2R1Y3RzL2ludGVybWFwcGVyLXJlbW90ZWFjY2Vzcy8YaW50ZXJtYXBwZXItcmVtb3RlYWNjZXNzABhJbnRlck1hcHBlciBSZW1vdGVBY2Nlc3NkAgUPZBYCZg8VAxhpbnRlcm1hcHBlci1yZW1vdGVhY2Nlc3MAGEludGVyTWFwcGVyIFJlbW90ZUFjY2Vzc2QCBw8WAh8FAgEWAmYPZBYGAgEPZBYCZg8VAyMvcHJvZHVjdHMvaW50ZXJtYXBwZXItcmVtb3RlYWNjZXNzLwAIRmVhdHVyZXNkAgMPZBYCZg8VBCMvcHJvZHVjdHMvaW50ZXJtYXBwZXItcmVtb3RlYWNjZXNzLw1mZWF0dXJlcy5hc3B4AAhGZWF0dXJlc2QCBQ9kFgJmDxUDDWZlYXR1cmVzLmFzcHgACEZlYXR1cmVzZAICD2QWCAIBD2QWAmYPFQMcL3Byb2R1Y3RzL2ludGVybWFwcGVyLWZsb3dzLwARSW50ZXJNYXBwZXIgRmxvd3NkAgMPZBYCZg8VBBwvcHJvZHVjdHMvaW50ZXJtYXBwZXItZmxvd3MvEWludGVybWFwcGVyLWZsb3dzABFJbnRlck1hcHBlciBGbG93c2QCBQ9kFgJmDxUDEWludGVybWFwcGVyLWZsb3dzABFJbnRlck1hcHBlciBGbG93c2QCBw8WAh8FAgEWAmYPZBYGAgEPZBYCZg8VAxwvcHJvZHVjdHMvaW50ZXJtYXBwZXItZmxvd3MvAAhGZWF0dXJlc2QCAw9kFgJmDxUEHC9wcm9kdWN0cy9pbnRlcm1hcHBlci1mbG93cy8NZmVhdHVyZXMuYXNweAAIRmVhdHVyZXNkAgUPZBYCZg8VAw1mZWF0dXJlcy5hc3B4AAhGZWF0dXJlc2QCGA9kFgJmD2QWAgIBDxYCHwUCBBYIZg9kFggCAQ9kFgJmDxUDCy9zb2x1dGlvbnMvACFNb25pdG9yaW5nIGFuZCBOZXR3b3JrIE1hbmFnZW1lbnRkAgMPZBYCZg8VBAsvc29sdXRpb25zLyZtb25pdG9yaW5nLWFuZC1uZXR3b3JrLW1hbmFnZW1lbnQuYXNweAAhTW9uaXRvcmluZyBhbmQgTmV0d29yayBNYW5hZ2VtZW50ZAIFD2QWAmYPFQMmbW9uaXRvcmluZy1hbmQtbmV0d29yay1tYW5hZ2VtZW50LmFzcHgAIU1vbml0b3JpbmcgYW5kIE5ldHdvcmsgTWFuYWdlbWVudGQCBw8WAh8FAv////8PZAIBD2QWCAIBD2QWAmYPFQMcL3NvbHV0aW9ucy93aG8td2Utd29yay13aXRoLwAQV2hvIFdlIFdvcmsgV2l0aGQCAw9kFgJmDxUEHC9zb2x1dGlvbnMvd2hvLXdlLXdvcmstd2l0aC8Qd2hvLXdlLXdvcmstd2l0aAAQV2hvIFdlIFdvcmsgV2l0aGQCBQ9kFgJmDxUDEHdoby13ZS13b3JrLXdpdGgAEFdobyBXZSBXb3JrIFdpdGhkAgcPFgIfBQL/////D2QCAg9kFggCAQ9kFgJmDxUDCy9zb2x1dGlvbnMvAApDb21wbGlhbmNlZAIDD2QWAmYPFQQLL3NvbHV0aW9ucy8PY29tcGxpYW5jZS5hc3B4AApDb21wbGlhbmNlZAIFD2QWAmYPFQMPY29tcGxpYW5jZS5hc3B4AApDb21wbGlhbmNlZAIHDxYCHwUC/////w9kAgMPZBYIAgEPZBYCZg8VAwsvc29sdXRpb25zLwAnTW9uaXRvciBBbnl0aGluZyBDb25uZWN0ZWQgdG8gYSBOZXR3b3JrZAIDD2QWAmYPFQQLL3NvbHV0aW9ucy8sbW9uaXRvci1hbnl0aGluZy1jb25uZWN0ZWQtdG8tYS1uZXR3b3JrLmFzcHgAJ01vbml0b3IgQW55dGhpbmcgQ29ubmVjdGVkIHRvIGEgTmV0d29ya2QCBQ9kFgJmDxUDLG1vbml0b3ItYW55dGhpbmctY29ubmVjdGVkLXRvLWEtbmV0d29yay5hc3B4ACdNb25pdG9yIEFueXRoaW5nIENvbm5lY3RlZCB0byBhIE5ldHdvcmtkAgcPFgIfBQL/////D2QCGQ9kFgJmD2QWAgIBDxYCHwUCBxYOZg9kFggCAQ9kFgJmDxUDCy9yZXNvdXJjZXMvAAxUZXN0aW1vbmlhbHNkAgMPZBYCZg8VBAsvcmVzb3VyY2VzLxF0ZXN0aW1vbmlhbHMuYXNweAAMVGVzdGltb25pYWxzZAIFD2QWAmYPFQMRdGVzdGltb25pYWxzLmFzcHgADFRlc3RpbW9uaWFsc2QCBw8WAh8FAv////8PZAIBD2QWCAIBD2QWAmYPFCsCAwUBL2QFBEJsb2dkAgMPZBYCZg8UKwIEBQEvBRxodHRwOi8vYmxvZy5pbnRlcm1hcHBlci5jb20vZAUEQmxvZ2QCBQ9kFgJmDxQrAgMFHGh0dHA6Ly9ibG9nLmludGVybWFwcGVyLmNvbS9kBQRCbG9nZAIHDxYCHwUC/////w9kAgIPZBYIAgEPZBYCZg8VAwsvcmVzb3VyY2VzLwALRGF0YSBTaGVldHNkAgMPZBYCZg8VBAsvcmVzb3VyY2VzLw9kYXRhc2hlZXRzLmFzcHgAC0RhdGEgU2hlZXRzZAIFD2QWAmYPFQMPZGF0YXNoZWV0cy5hc3B4AAtEYXRhIFNoZWV0c2QCBw8WAh8FAv////8PZAIDD2QWCAIBD2QWAmYPFQMLL3Jlc291cmNlcy8ADENhc2UgU3R1ZGllc2QCAw9kFgJmDxUECy9yZXNvdXJjZXMvEWNhc2Utc3R1ZGllcy5hc3B4AAxDYXNlIFN0dWRpZXNkAgUPZBYCZg8VAxFjYXNlLXN0dWRpZXMuYXNweAAMQ2FzZSBTdHVkaWVzZAIHDxYCHwUC/////w9kAgQPZBYIAgEPZBYCZg8VAwsvcmVzb3VyY2VzLwAMV2hpdGUgUGFwZXJzZAIDD2QWAmYPFQQLL3Jlc291cmNlcy8Qd2hpdGVwYXBlcnMuYXNweAAMV2hpdGUgUGFwZXJzZAIFD2QWAmYPFQMQd2hpdGVwYXBlcnMuYXNweAAMV2hpdGUgUGFwZXJzZAIHDxYCHwUC/////w9kAgUPZBYIAgEPZBYCZg8VAwsvcmVzb3VyY2VzLwAGVmlkZW9zZAIDD2QWAmYPFQQLL3Jlc291cmNlcy8LdmlkZW9zLmFzcHgABlZpZGVvc2QCBQ9kFgJmDxUDC3ZpZGVvcy5hc3B4AAZWaWRlb3NkAgcPFgIfBQL/////D2QCBg9kFggCAQ9kFgJmDxUDCy9yZXNvdXJjZXMvABJTaWduIFVwIEZvciBBIERlbW9kAgMPZBYCZg8VBAsvcmVzb3VyY2VzLxdzaWduLXVwLWZvci1hLWRlbW8uYXNweAASU2lnbiBVcCBGb3IgQSBEZW1vZAIFD2QWAmYPFQMXc2lnbi11cC1mb3ItYS1kZW1vLmFzcHgAElNpZ24gVXAgRm9yIEEgRGVtb2QCBw8WAh8FAv////8PZAIaD2QWAmYPZBYCAgEPFgIfBQIJFhJmD2QWCAIBD2QWAmYPFQMBLwZfYmxhbmsOS25vd2xlZGdlIEJhc2VkAgMPZBYCZg8VBAEvUGh0dHA6Ly9mb3J1bXMuaW50ZXJtYXBwZXIuY29tL2luZGV4LnBocD9jPTMmc2lkPWU3MjhhNzU5ZTMwMWRmMTc0NDQ0MWE1NTViODE5MWIwBl9ibGFuaw5Lbm93bGVkZ2UgQmFzZWQCBQ9kFgJmDxUDUGh0dHA6Ly9mb3J1bXMuaW50ZXJtYXBwZXIuY29tL2luZGV4LnBocD9jPTMmc2lkPWU3MjhhNzU5ZTMwMWRmMTc0NDQ0MWE1NTViODE5MWIwBl9ibGFuaw5Lbm93bGVkZ2UgQmFzZWQCBw8WAh8FAv////8PZAIBD2QWCAIBD2QWAmYPFQMJL3N1cHBvcnQvABVQcm9kdWN0IERvY3VtZW50YXRpb25kAgMPZBYCZg8VBAkvc3VwcG9ydC8acHJvZHVjdC1kb2N1bWVudGF0aW9uLmFzcHgAFVByb2R1Y3QgRG9jdW1lbnRhdGlvbmQCBQ9kFgJmDxUDGnByb2R1Y3QtZG9jdW1lbnRhdGlvbi5hc3B4ABVQcm9kdWN0IERvY3VtZW50YXRpb25kAgcPFgIfBQL/////D2QCAg9kFggCAQ9kFgJmDxUDCS9zdXBwb3J0LwAWSW50ZXJNYXBwZXIgVGFsayBGb3J1bWQCAw9kFgJmDxUECS9zdXBwb3J0LxtpbnRlcm1hcHBlci10YWxrLWZvcnVtLmFzcHgAFkludGVyTWFwcGVyIFRhbGsgRm9ydW1kAgUPZBYCZg8VAxtpbnRlcm1hcHBlci10YWxrLWZvcnVtLmFzcHgAFkludGVyTWFwcGVyIFRhbGsgRm9ydW1kAgcPFgIfBQL/////D2QCAw9kFggCAQ9kFgJmDxUDCS9zdXBwb3J0LwATU3lzdGVtIFJlcXVpcmVtZW50c2QCAw9kFgJmDxUECS9zdXBwb3J0LxhzeXN0ZW0tcmVxdWlyZW1lbnRzLmFzcHgAE1N5c3RlbSBSZXF1aXJlbWVudHNkAgUPZBYCZg8VAxhzeXN0ZW0tcmVxdWlyZW1lbnRzLmFzcHgAE1N5c3RlbSBSZXF1aXJlbWVudHNkAgcPFgIfBQL/////D2QCBA9kFggCAQ9kFgJmDxUDCS9zdXBwb3J0LwAPVmlkZW8gVHV0b3JpYWxzZAIDD2QWAmYPFQQJL3N1cHBvcnQvFHZpZGVvLXR1dG9yaWFscy5hc3B4AA9WaWRlbyBUdXRvcmlhbHNkAgUPZBYCZg8VAxR2aWRlby10dXRvcmlhbHMuYXNweAAPVmlkZW8gVHV0b3JpYWxzZAIHDxYCHwUC/////w9kAgUPZBYIAgEPZBYCZg8VAwkvc3VwcG9ydC8ABEZBUXNkAgMPZBYCZg8VBAkvc3VwcG9ydC8JZmFxcy5hc3B4AARGQVFzZAIFD2QWAmYPFQMJZmFxcy5hc3B4AARGQVFzZAIHDxYCHwUC/////w9kAgYPZBYIAgEPZBYCZg8VAxcvc3VwcG9ydC9yZWxlYXNlLW5vdGVzLwANUmVsZWFzZSBOb3Rlc2QCAw9kFgJmDxUEFy9zdXBwb3J0L3JlbGVhc2Utbm90ZXMvDXJlbGVhc2Utbm90ZXMADVJlbGVhc2UgTm90ZXNkAgUPZBYCZg8VAw1yZWxlYXNlLW5vdGVzAA1SZWxlYXNlIE5vdGVzZAIHDxYCHwUC/////w9kAgcPZBYIAgEPZBYCZg8VAwkvc3VwcG9ydC8ABlByb2Jlc2QCAw9kFgJmDxUECS9zdXBwb3J0Lwtwcm9iZXMuYXNweAAGUHJvYmVzZAIFD2QWAmYPFQMLcHJvYmVzLmFzcHgABlByb2Jlc2QCBw8WAh8FAv////8PZAIID2QWCAIBD2QWAmYPFQMJL3N1cHBvcnQvAAdVcGdyYWRlZAIDD2QWAmYPFQQJL3N1cHBvcnQvDHVwZ3JhZGUuYXNweAAHVXBncmFkZWQCBQ9kFgJmDxUDDHVwZ3JhZGUuYXNweAAHVXBncmFkZWQCBw8WAh8FAv////8PZBgBBR5fX0NvbnRyb2xzUmVxdWlyZVBvc3RCYWNrS2V5X18WAQUYY3RsMDAkY3RsMDUkc2VhcmNoQnV0dG9uaPghUCSLa7C3t+KJ8xtoDaT93nUF2qV5+fbir4jHBz8=" />
+</div>
+
+	<input type='hidden' id='formName' name='formName' value='this-form' />
+	<div id="contentInner">
+        
+
+<table width="952" cellpadding="0" cellspacing="0" border="0" align="center">
+<tr>
+	<td width="286" valign="top"><a href="/default.aspx"><img src="/library/images/common/logo.gif" alt="InterMapper: Real-time Network Knowledge" title="InterMapper: Real-time Network Knowledge" border="0" /></a></td>
+
+    <td class="top-nav" width="666" valign="top">
+        <table width="666" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td colspan="5" height="9"></td>
+        </tr>
+        <tr>
+            <td width="13"></td>
+            <td width="421">
+                <ul>
+
+                    <li><a href="/about-us/">About Us</a></li>
+                    <li><a href="http://blog.intermapper.com/">Blog</a></li>
+                    <li><a href="/partners/">Partners</a></li>
+               <!-- <li><a href="/community/">Community</a></li> -->
+                    <li><a href="/contact-us/">Contact Us</a></li>
+                    <li><a href="/store/">Store</a></li>
+
+                </ul>
+            </td>
+            <td style="background: #fff url(/library/images/common/search-bg.gif) top left no-repeat;" width="189">
+            	<!--[if IE]><input type="text" style="display: none;" disabled="disabled" size="1" /><![endif]-->
+                <input name="ctl00$ctl05$cx" type="hidden" id="ctl05_cx" value="017484338234251101766:kyztvvqfxdu" />
+                <input name="ctl00$ctl05$cof" type="hidden" id="ctl05_cof" value="FORID:10" />
+                <input name="ctl00$ctl05$ie" type="hidden" id="ctl05_ie" value="UTF-8" />
+                <input name="ctl00$ctl05$q" type="text" id="ctl05_q" autocomplete="off" size="31" class="searchIP" submitButtonID="ctl05_searchButton" />
+            </td>
+
+            <td width="30"><input type="image" name="ctl00$ctl05$searchButton" id="ctl05_searchButton" src="../../library/images/buttons/go.gif" alt="GO" onclick="NoSubmitPostBack();" /></td>
+            <td width="13"></td>
+        </tr>
+        </table>
+        
+      <table width="666" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+        	<td colspan="3" height="37"></td>
+        </tr>
+        <tr>
+
+        	<td width="200"></td>
+        	<td width="150">
+                <dl class="dropdown">
+                    <dt><a href="javascript:;"><span>Language Assistance</span></a></dt>
+                    <dd>
+                        <ul>
+                        	<li><a href="/language-assistance/intermapper-arabic.aspx"><img src="/library/images/common/arabic-text.gif" alt="Arabic" title="Arabic" border="0" /></a></li>
+                            <li><a href="/language-assistance/intermapper-chinese.aspx"><img src="/library/images/common/chinese-text.gif" alt="Chinese" title="Chinese" border="0" /></a></li>
+
+                            <li><a href="/language-assistance/intermapper-english.aspx">English</a></li>
+                            <li><a href="/language-assistance/intermapper-french.aspx">Fran&#231;aise</a></li>
+                            <li><a href="/language-assistance/intermapper-german.aspx">Deutsch</a></li>
+                            <li><a href="/language-assistance/intermapper-greek.aspx"><img src="/library/images/common/greek-text.gif" alt="Greek" title="Greek" border="0" /></a></li>
+                            <li><a href="/language-assistance/intermapper-italian.aspx">Italiano</a></li>
+                            <li><a href="/language-assistance/intermapper-japanese.aspx"><img src="/library/images/common/japanese-text.gif" alt="Japanese" title="Japanese" border="0" /></a></li>
+
+                            <li><a href="/language-assistance/intermapper-portuguese.aspx">Portugu&#234;s</a></li>
+                            <li><a href="/language-assistance/intermapper-spanish.aspx">Espa&#241;ol</a></li>
+                            <li><a href="/language-assistance/intermapper-turkish.aspx">T&#252;rk</a></li>                           
+                      </ul>
+                    </dd>
+               </dl>
+
+            </td>
+            <td class="contact-info" width="316" align="right">
+            	877.276.6903 | <a href="mailto:info@intermapper.com">info@intermapper.com</a>
+            </td>
+        </tr>
+        </table>
+	</td>
+</tr>
+
+</table>
+
+
+<table style="background: url(/library/images/common/nav-bg.gif) top center repeat-x;" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+	<td>
+		<table width="952" cellpadding="0" cellspacing="0" border="0" align="center">
+        <tr>
+        	<td align="right"><a href="/products/" id="ctl05_ctl00_ctl00_a" class="swapImage"><img src="/library/images/nav/products-0.gif" border="0" alt="" title="" /></a><a href="/solutions/" id="ctl05_ctl00_ctl01_a" class="swapImage"><img src="/library/images/nav/solutions-0.gif" border="0" alt="" title="" /></a><a href="/resources/" id="ctl05_ctl00_ctl02_a" class="swapImage"><img src="/library/images/nav/resources-0.gif" border="0" alt="" title="" /></a><a href="/support/" id="ctl05_ctl00_ctl03_a" class="swapImage"><img src="/library/images/nav/support-0.gif" border="0" alt="" title="" /></a><a href="/free-trial.aspx" id="ctl05_ctl00_ctl04_a" class="swapImage"><img src="/library/images/nav/free-trial-0.gif" border="0" alt="" title="" /></a></td>
+        </tr>
+		<tr>
+
+        	<td><div id="topnav-placeholder"></div></td>
+        </tr>
+        </table>
+    </td>
+</tr>
+</table>
+        <table width="952" cellpadding="0" cellspacing="0" border="0" align="center">
+        <tr>
+            <td colspan="5" height="33"></td>
+        </tr>
+
+        <tr>
+            <td width="175" valign="top">
+
+<div class="leftnav-container">
+	
+	
+</div>
+
+
+
+</td>
+            <td style="border-right: 1px dotted #767676;" width="25">&nbsp;</td>
+            <td width="30"></td>
+            <td class="content" width="475" valign="top">
+
+		
+<h1>IPv6 Address Validation</h1>
+<p>This page validates IPv6 address formats. The result below will indicate whether it's a valid and properly formatted IPv6 address.
+<br/><br/>
+Enter an IPv6 Address:</p>
+<p><input size="45" alt="Enter IPv6 Address" style="width: 400px; font-size: 16px; text-align: left;" value="::1" onblur="formatipv6field()" id="ipv6text" name="ipv6text" type="text"> <input type="button" value="Check" onClick="formatipv6field()" >
+</p>
+<div id="ipv6results"></div>
+<div style="font-family: Arial,Verdana,Sans-serif; font-size: 16px;">&nbsp;</div>
+<h2>What's the "Best Text Representation" of an IPv6 Address?</h2>
+<p>The draft IETF&nbsp;RFC <a href="http://tools.ietf.org/html/draft-ietf-6man-text-addr-representation-04" target="_blank">A Recommendation for IPv6 Address Text Representation</a> describes a preferred text representation for an IPv6 address. These sensible rules make the address lower-case, trim leading zeroes, shorten runs of zero segments (e.g. :0000:)&nbsp;as much as possible but not a single segment, and place the compressed zeros as far to the left as possible. The best representation is shown above.</p>
+
+<!-- <div style="font-family: Arial,Verdana,Sans-serif; font-size: 16px;" id="bestrepresentation">not initialized</div> -->
+<h2><script type="text/javascript" src="./ipv6validator.js"></script>  About this page</h2>
+<p>This page has a Javascript that tests an IPv6 address according to an elaborate regular expression (RE, or regex)&nbsp;for validation that the address is the proper. This regular expression is discussed further in <a href="http://forums.dartware.com/viewtopic.php?t=452">Dartware's Knowledge Base article</a> which also includes a number of test cases.&nbsp;In addition, the Javascript on this page presents the "best text representation" according to IETF Draft RFC cited above.</p>
+<p>The text of the script has a number of test cases that were used during development. Please let us know (<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#117;&#112;&#112;&#111;&#114;&#116;&#64;&#105;&#110;&#116;&#101;&#114;&#109;&#97;&#112;&#112;&#101;&#114;&#46;&#99;&#111;&#109;">support@intermapper.com</a>)&nbsp;if you find interesting test cases. Please feel free to use this code: we'd love to have a link to http://www.intermapper.com or this tech note.&nbsp;</p>
+
+<h2>IPv6 Test&nbsp;Cases</h2>
+<p>The <a href="http://download.dartware.com/thirdparty/test-ipv6-regex.pl">Perl test script</a> in the Knowledge Base has nearly 500 test cases of valid and invalid IPv6 addresses. You can use them to test your own implementation. In addition it has pointers to several other regular expressions that can be used for IPv6.</p>
+</td>
+            <td width="30"></td>
+            <td width="216" valign="top">
+				
+
+
+
+
+
+
+
+                <a href="/free-trial.aspx"><img src="/library/images/common/try-now-inner-callout.gif" alt="Try Now!" title="Try Now!" border="0" /></a><br /><br />
+
+                <a href="/resources/sign-up-for-a-demo.aspx"><img src="/library/images/common/live-demo-inner-callout.gif" alt="Attend A Live Demo" title="Attend A Live Demo" border="0" /></a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="5" height="33"></td>
+        </tr>
+        </table>
+        
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">IPv6 Validator</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://intermapper.com/ipv6validator" property="cc:attributionName" rel="cc:attributionURL">Dartware, LLC</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.				
+
+<table style="background: #c2c2c2 url(/library/images/common/footer-bg.gif) top center repeat-x;" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+
+	<td>
+        <table class="footer"  width="952" cellpadding="0" cellspacing="0" border="0" align="center">
+        <tr>
+        	<td colspan="3" height="40"></td>
+        </tr>
+        <tr>
+        	<td width="20"></td>
+            <td width="912">
+                <ul>
+
+                    <li class="footer-category"><a href="/products/">Products</a></li>
+                    <li><a href="/products/intermapper/">InterMapper</a></li>
+                    <li><a href="/products/intermapper-remoteaccess/">InterMapper RemoteAccess</a></li>
+                    <li><a href="/products/intermapper-flows/">InterMapper Flows</a></li>
+                </ul>
+                <ul>
+                    <li class="footer-category"><a href="/solutions/">Solutions</a></li>
+
+                    <li><a href="/solutions/monitoring-and-network-management.aspx">Monitoring and Network<br />Management</a></li>
+                    <li><a href="/solutions/who-we-work-with/">Who We Work With</a></li>
+                    <li><a href="/solutions/compliance.aspx">Compliance</a></li>
+                    <li><a href="/solutions/monitor-anything-connected-to-a-network.aspx">Monitor Anything Connected<br />to a Network</a></li>                  
+              </ul>
+                <ul>
+
+                    <li class="footer-category"><a href="/resources/">Resources</a></li>
+                    <li><a href="/resources/testimonials.aspx">Testimonials</a></li>
+                    <li><a href="http://blog.intermapper.com/">Blog</a></li>
+                    <li><a href="/resources/datasheets.aspx">Data Sheets</a></li>
+                    <li><a href="/resources/case-studies.aspx">Case Studies</a></li>
+                    <li><a href="/resources/whitepapers.aspx">Whitepapers</a></li>
+
+                    <li><a href="/resources/videos.aspx">Videos</a></li>
+                    <li><a href="/resources/sign-up-for-a-demo.aspx">Sign up for a Demo</a></li>
+                </ul>
+                <ul>
+                    <li class="footer-category"><a href="/support/">Support</a></li>
+                    <li><a href="http://forums.dartware.com/index.php?c=3" target="_blank">Knowledge Base</a></li>
+                    <li><a href="/support/product-documentation.aspx">Product Documentation</a></li>
+
+                    <li><a href="/support/intermapper-talk-forum.aspx">InterMapper Talk Forum</a></li>
+                    <li><a href="/support/system-requirements.aspx">System Requirements</a></li>
+                	<li><a href="/support/video-tutorials.aspx">Video Tutorials</a></li>
+                    <li><a href="/support/faqs.aspx">FAQs</a></li>
+                  	<li><a href="/support/release-notes/default.aspx">Release Notes</a></li>      
+                  	<li><a href="/support/probes.aspx">Probes</a></li>
+
+                    <li><a href="/support/upgrade.aspx">Upgrade</a></li>
+                </ul>
+                <ul class="last">
+                    <li class="footer-category"><a href="/free-trial.aspx">Free Trial</a></li>
+                </ul>
+            </td>
+            <td width="20"></td>
+        </tr>
+
+        <tr>
+        	<td colspan="3" height="40"></td>
+        </tr>
+        </table>
+        <table style="line-height: 20px;" class="footer" width="952" cellpadding="0" cellspacing="0" border="0" align="center">
+        <tr>
+        	<td width="20"></td>
+            <td width="754" valign="top">
+            	&copy; Copyright <span id="ctl07_copyrightYear">2011</span>, Dartware, LLC&nbsp;&nbsp;|&nbsp;&nbsp;877.276.6903&nbsp;&nbsp;|&nbsp;&nbsp;<a href="mailto:info@dartware.com">info@dartware.com</a><br />
+
+        		<a href="/about-us/">About Us</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://blog.intermapper.com">Blog</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/partners/">Partners</a>&nbsp;&nbsp;|&nbsp;&nbsp;<!--<a href="/community/">Community</a>&nbsp;&nbsp;|&nbsp;&nbsp;--><a href="/contact-us/">Contact Us</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#">Store</a><br />
+        		<a href="/privacy-policy.aspx">Privacy Policy</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/sitemap.aspx">Sitemap</a>
+            </td>
+
+            <td width="178" valign="top">
+            	<table width="111" cellpadding="0" cellspacing="0" border="0" align="right">
+                <tr>
+                    <td width="37" align="right"><a href="http://blog.intermapper.com/?feed=rss" target="_blank"><img src="/library/images/common/rss.gif" alt="RSS" title="RSS" border="0" /></a></td>
+                    <td width="37" align="right"><a href="http://www.linkedin.com/company/dartware-llc" target="_blank"><img src="/library/images/common/linkedin.gif" alt="LinkedIn" title="LinkedIn" border="0" /></a></td>
+                    <!--<td width="37" align="right"><a href="#"><img src="/library/images/common/facebook.gif" alt="Facebook" title="Facebook" border="0" /></a></td>-->
+                    <td width="37" align="right"><a href="http://twitter.com/#!/intermapper" target="_blank"><img src="/library/images/common/twitter.gif" alt="Twitter" title="Twitter" border="0" /></a></td>
+        		</tr>
+                <tr>
+
+                	<td colspan="4" height="15"></td>
+                </tr>
+                <tr>
+                	<td colspan="4" align="right"><a href="http://www.silvertech.com" target="_blank"><img src="/library/images/common/silvertech.gif" alt="Powered by SilverTech" title="Powered by SilverTech" border="0" /></a></td>
+                </tr>
+                </table>
+        	</td>
+        </tr>
+        <tr>
+
+        	<td colspan="7" height="30"></td>
+        </tr>
+        </table>
+	</td>
+</tr>
+</table>
+		
+	</div>
+<div id="topnav_ctl05_ctl00_ctl00_a" class="topnav-container topnav-container-hidden ">
+	<table cellpadding="0" cellspacing="0" border="0">
+	    <tr>
+
+            <td valign="top">
+		        <div class="topnav-column">
+	                
+                            
+					            <div class="topnav-title"><a href="/products/intermapper/" target="">InterMapper</a></div>
+				            
+				            
+				            
+
+	                        
+                                    
+				                    
+					                    <div class="topnav-link"><a href="/products/intermapper/features.aspx" target="">Features</a></div>
+				                    
+				                    
+	                            
+                                    
+				                    
+					                    <div class="topnav-link"><a href="/products/intermapper/whats-new.aspx" target="">What's New in 5.4</a></div>
+				                    
+				                    
+	                            
+                                    
+				                    
+					                    <div class="topnav-link"><a href="/products/intermapper/customer-map-gallery.aspx" target="">Customer Map Gallery</a></div>
+				                    
+				                    
+	                            
+	                    
+                            
+					            <div class="topnav-title"><a href="/products/intermapper-remoteaccess/" target="">InterMapper RemoteAccess</a></div>
+
+				            
+				            
+				            
+
+	                        
+                                    
+				                    
+					                    <div class="topnav-link"><a href="/products/intermapper-remoteaccess/features.aspx" target="">Features</a></div>
+				                    
+				                    
+	                            
+	                    
+                            
+					            <div class="topnav-title"><a href="/products/intermapper-flows/" target="">InterMapper Flows</a></div>
+				            
+				            
+				            
+
+	                        
+                                    
+				                    
+					                    <div class="topnav-link"><a href="/products/intermapper-flows/features.aspx" target="">Features</a></div>
+				                    
+				                    
+	                            
+	                    
+                </div>
+            </td>
+	    </tr>
+	</table>
+
+</div><div id="topnav_ctl05_ctl00_ctl01_a" class="topnav-container topnav-container-hidden ">
+	<table cellpadding="0" cellspacing="0" border="0">
+	    <tr>
+            <td valign="top">
+		        <div class="topnav-column">
+	                
+                            
+				            
+					            <div class="topnav-title"><a href="/solutions/monitoring-and-network-management.aspx" target="">Monitoring and Network Management</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+					            <div class="topnav-title"><a href="/solutions/who-we-work-with/" target="">Who We Work With</a></div>
+				            
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/solutions/compliance.aspx" target="">Compliance</a></div>
+
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/solutions/monitor-anything-connected-to-a-network.aspx" target="">Monitor Anything Connected to a Network</a></div>
+				            
+				            
+
+	                        
+	                    
+                </div>
+            </td>
+	    </tr>
+	</table>
+</div><div id="topnav_ctl05_ctl00_ctl02_a" class="topnav-container topnav-container-hidden ">
+	<table cellpadding="0" cellspacing="0" border="0">
+	    <tr>
+            <td valign="top">
+
+		        <div class="topnav-column">
+	                
+                            
+				            
+					            <div class="topnav-title"><a href="/resources/testimonials.aspx" target="">Testimonials</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+				            
+					            <div class="topnav-title"><a href="http://blog.intermapper.com/" target="">Blog</a></div>
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/resources/datasheets.aspx" target="">Data Sheets</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/resources/case-studies.aspx" target="">Case Studies</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/resources/whitepapers.aspx" target="">White Papers</a></div>
+
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/resources/videos.aspx" target="">Videos</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/resources/sign-up-for-a-demo.aspx" target="">Sign Up For A Demo</a></div>
+				            
+				            
+
+	                        
+	                    
+                </div>
+            </td>
+	    </tr>
+	</table>
+</div><div id="topnav_ctl05_ctl00_ctl03_a" class="topnav-container topnav-container-hidden ">
+	<table cellpadding="0" cellspacing="0" border="0">
+
+	    <tr>
+            <td valign="top">
+		        <div class="topnav-column">
+	                
+                            
+				            
+				            
+					            <div class="topnav-title"><a href="http://forums.intermapper.com/index.php?c=3&sid=e728a759e301df1744441a555b8191b0" target="_blank">Knowledge Base</a></div>
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/support/product-documentation.aspx" target="">Product Documentation</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/support/intermapper-talk-forum.aspx" target="">InterMapper Talk Forum</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/support/system-requirements.aspx" target="">System Requirements</a></div>
+
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/support/video-tutorials.aspx" target="">Video Tutorials</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/support/faqs.aspx" target="">FAQs</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+					            <div class="topnav-title"><a href="/support/release-notes/" target="">Release Notes</a></div>
+				            
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/support/probes.aspx" target="">Probes</a></div>
+				            
+				            
+
+	                        
+	                    
+                            
+				            
+					            <div class="topnav-title"><a href="/support/upgrade.aspx" target="">Upgrade</a></div>
+				            
+				            
+
+	                        
+	                    
+                </div>
+
+            </td>
+	    </tr>
+	</table>
+</div></form>
+</body>
+</html>

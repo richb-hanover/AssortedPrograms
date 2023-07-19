@@ -1,0 +1,42 @@
+#! /bin/sh
+# for low bandwidth links fq_codels default target of 5ms does not work too well
+# so increase target for slow links (note below roughly 2500kbps a single packet will \
+# take more than 5 ms to be tansfered over the wire)
+#
+# This calculation computes the time it takes to send a single MTU (1540 bytes),
+# at the CUR_LINK_KBPS (passed in as parameter). If  the time is less than 5000 usec, 
+# clamp to 5000 usec (=5 msec). 
+#
+# This calculation is carried out in usec (microseconds) to preserve significant digits 
+# for the small values of the results. See alternative below for returning result in msec.
+#
+
+adapt_target_to_slow_link() {
+    CUR_LINK_KBPS=$1
+    MAX_PACKET_BITS_SCALED=$(( 1540 * 8 * 1000 ))		# Length of packets in bits, multiplied by 1000 to preserve precision
+    CUR_EXTENDED_TARGET_US=$(( ${MAX_PACKET_BITS_SCALED} / ${CUR_LINK_KBPS} ))	# result is microseconds to send the packet
+    # do not change anything for fast links
+    [ "$CUR_EXTENDED_TARGET_US" -lt 5000 ] && CUR_EXTENDED_TARGET_US=5000
+    case ${QDISC} in
+        *codel|pie)
+	    echo "${CUR_LINK_KBPS}: ${CUR_EXTENDED_TARGET_US}"
+	    ;;
+    esac
+
+    # NB: If the caller is going to divide ${CUR_EXTENDED_TARGET_US} by 1000 and truncate results
+    #   to get milliseconds, then this code should add 500 usec to perform proper rounding
+	# Alternatively, this code could return the rounded msec value, which the caller could use directly
+}
+
+QDISC="fq_codel"
+adapt_target_to_slow_link "512"
+adapt_target_to_slow_link "745"
+adapt_target_to_slow_link "768"
+adapt_target_to_slow_link "830"
+adapt_target_to_slow_link "1000"
+adapt_target_to_slow_link "1500"
+adapt_target_to_slow_link "2000"
+adapt_target_to_slow_link "2500"
+adapt_target_to_slow_link "3000"
+
+echo 
