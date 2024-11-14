@@ -1,0 +1,654 @@
+WITH table_7 AS (
+  SELECT
+    COUNT(*) AS "NumBldgs",
+    ROUND(
+      MAX(("BL_Gross_Floor_Area" * 1.0 / "BL_Stories")),
+      1
+    ) AS "ActBiggestBldg_sf",
+    COALESCE(SUM("BL_Gross_Floor_Area"), 0) AS "ActGFA_sf",
+    ROUND(
+      COALESCE(
+        SUM(("BL_Gross_Floor_Area" * 1.0 / "BL_Stories")),
+        0
+      ),
+      1
+    ) AS _expr_0,
+    "BL_PID"
+  FROM
+    buildings
+  GROUP BY
+    "BL_PID"
+),
+table_6 AS (
+  SELECT
+    sd."PID",
+    table_7."NumBldgs",
+    table_7."ActBiggestBldg_sf",
+    table_7."ActGFA_sf",
+    sd."Street_Address",
+    sd."EF_Frontage",
+    table_7._expr_0,
+    sd."Lot_Size",
+    CASE
+      WHEN sd."District" = 'ES' THEN 'RD'
+      WHEN sd."District" = 'R' THEN 'RD'
+      WHEN sd."District" = 'SFR' THEN 'RD'
+      WHEN sd."District" = 'URD' THEN 'RD'
+      WHEN sd."District" = 'LCD' THEN 'LCD'
+      WHEN sd."District" = 'CD' THEN 'LCD'
+      WHEN sd."District" = 'LDC' THEN 'LCD'
+      WHEN sd."District" = 'SD' THEN 'RD'
+      WHEN sd."District" = '' THEN 'Unknown'
+      ELSE sd."District"
+    END AS _expr_1,
+    sd."District"
+  FROM
+    table_7
+    JOIN "CleanScrapedData" AS sd ON table_7."BL_PID" = sd."PID"
+  WHERE
+    sd."Lot_Size" <> 0
+),
+table_5 AS (
+  SELECT
+    CASE
+      WHEN _expr_1 = 'LCD' THEN 'LymeCommon/Ctr'
+      WHEN _expr_1 = 'BD' THEN 'Commercial'
+      WHEN _expr_1 = 'RD'
+      AND CASE
+        WHEN "Street_Address" like '%' || 'ORFORD ' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DARTMOUTH COLLEGE' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DORCHESTER' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'THETFORD' || '%' THEN 1
+        ELSE 0
+      END = 1 THEN 'Rural-State Road'
+      WHEN _expr_1 = 'RD'
+      AND CASE
+        WHEN "Street_Address" like '%' || 'ORFORD ' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DARTMOUTH COLLEGE' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DORCHESTER' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'THETFORD' || '%' THEN 1
+        ELSE 0
+      END = 0 THEN 'Rural-Town Road'
+      WHEN _expr_1 = 'ELD' THEN 'EastLyme'
+      WHEN _expr_1 = 'SKIWAY' THEN 'Skiway'
+      WHEN _expr_1 = 'MFD' THEN 'MtnForest'
+      ELSE _expr_1
+    END AS "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "ActBiggestBldg_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage",
+    _expr_0,
+    "Lot_Size",
+    _expr_1
+  FROM
+    table_6
+),
+table_4 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "Lot_Size" AS "ActLotSize_ac",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 1.0
+      WHEN "ZoningDistrict" = 'Commercial' THEN 2.0
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 3.0
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 5.0
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 15.0
+      WHEN "ZoningDistrict" = 'Skiway' THEN 2.0
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 50.0
+      ELSE '?'
+    END AS "AllowedLotSize_ac",
+    "ActBiggestBldg_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage",
+    _expr_0
+  FROM
+    table_5
+),
+table_3 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    CASE
+      WHEN "ActLotSize_ac" < "AllowedLotSize_ac" THEN 1
+      ELSE 0
+    END AS "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    "ActBiggestBldg_sf",
+    ROUND(
+      (
+        "ActLotSize_ac" * 43560 * CASE
+          WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 6.0
+          WHEN "ZoningDistrict" = 'Commercial' THEN 10.0
+          WHEN "ZoningDistrict" = 'Rural-State Road' THEN 2.0
+          WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 2.0
+          WHEN "ZoningDistrict" = 'EastLyme' THEN 1.0
+          WHEN "ZoningDistrict" = 'Skiway' THEN 1.0
+          WHEN "ZoningDistrict" = 'MtnForest' THEN 1.0
+          ELSE '?'
+        END * 1.0 / 100.0
+      ),
+      1
+    ) AS "AllowedBldgFtprt_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage",
+    _expr_0
+  FROM
+    table_4
+),
+table_2 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    CASE
+      WHEN "ActBiggestBldg_sf" > "AllowedBldgFtprt_sf" THEN 1
+      ELSE 0
+    END AS "BldgTooBig",
+    "ActBiggestBldg_sf",
+    "AllowedBldgFtprt_sf",
+    ROUND(
+      (
+        "ActBiggestBldg_sf" * 100.0 * 1.0 / (43560 * "ActLotSize_ac")
+      ),
+      1
+    ) AS "ActBldgFtprt_pct",
+    ROUND(
+      CASE
+        WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 6.0
+        WHEN "ZoningDistrict" = 'Commercial' THEN 10.0
+        WHEN "ZoningDistrict" = 'Rural-State Road' THEN 2.0
+        WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 2.0
+        WHEN "ZoningDistrict" = 'EastLyme' THEN 1.0
+        WHEN "ZoningDistrict" = 'Skiway' THEN 1.0
+        WHEN "ZoningDistrict" = 'MtnForest' THEN 1.0
+        ELSE '?'
+      END,
+      1
+    ) AS "AllowedBldgFtprt_pct",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN _expr_0 + 450
+      ELSE _expr_0
+    END AS "ActLotCoverage_sf",
+    ROUND(
+      (
+        "ActLotSize_ac" * 43560 * CASE
+          WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 12.0
+          WHEN "ZoningDistrict" = 'Commercial' THEN 20.0
+          WHEN "ZoningDistrict" = 'Rural-State Road' THEN 12.0
+          WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 12.0
+          WHEN "ZoningDistrict" = 'EastLyme' THEN 12.0
+          WHEN "ZoningDistrict" = 'Skiway' THEN 2.0
+          WHEN "ZoningDistrict" = 'MtnForest' THEN 2.0
+          ELSE '?'
+        END * 1.0 / 100.0
+      ),
+      1
+    ) AS "AllowedLotCoverage_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage"
+  FROM
+    table_3
+),
+table_1 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    "BldgTooBig",
+    "ActBiggestBldg_sf",
+    "AllowedBldgFtprt_sf",
+    "ActBldgFtprt_pct",
+    "AllowedBldgFtprt_pct",
+    CASE
+      WHEN "ActLotCoverage_sf" > "AllowedLotCoverage_sf" THEN 1
+      ELSE 0
+    END AS "CovTooBig",
+    "ActLotCoverage_sf",
+    "AllowedLotCoverage_sf",
+    ROUND(
+      (
+        "ActLotCoverage_sf" * 100 * 1.0 / (43560 * "ActLotSize_ac")
+      ),
+      1
+    ) AS "ActLotCoverage_pct",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 12.0
+      WHEN "ZoningDistrict" = 'Commercial' THEN 20.0
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 12.0
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 12.0
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 12.0
+      WHEN "ZoningDistrict" = 'Skiway' THEN 2.0
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 2.0
+      ELSE '?'
+    END AS "AllowedLotCoverage_pct",
+    "ActGFA_sf",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 6000.0
+      WHEN "ZoningDistrict" = 'Commercial' THEN 14000.0
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 14000.0
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 14000.0
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 14000.0
+      WHEN "ZoningDistrict" = 'Skiway' THEN 14000.0
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 14000.0
+      ELSE '?'
+    END AS "AllowedGFA_sf",
+    "Street_Address",
+    "EF_Frontage"
+  FROM
+    table_2
+),
+table_0 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    "BldgTooBig",
+    "ActBiggestBldg_sf",
+    "AllowedBldgFtprt_sf",
+    "ActBldgFtprt_pct",
+    "AllowedBldgFtprt_pct",
+    "CovTooBig",
+    "ActLotCoverage_sf",
+    "AllowedLotCoverage_sf",
+    "ActLotCoverage_pct",
+    "AllowedLotCoverage_pct",
+    CASE
+      WHEN "ActGFA_sf" > "AllowedGFA_sf" THEN 1
+      ELSE 0
+    END AS "GFATooBig",
+    "ActGFA_sf",
+    "AllowedGFA_sf",
+    "EF_Frontage" AS "ActFrontage_ft",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 100
+      WHEN "ZoningDistrict" = 'Commercial' THEN 200
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 300
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 300
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 600
+      WHEN "ZoningDistrict" = 'Skiway' THEN 600
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 1000
+      ELSE '?'
+    END AS "AllowedFrontage_ft",
+    "Street_Address"
+  FROM
+    table_1
+)
+SELECT
+  "ZoningDistrict",
+  "PID",
+  "Street_Address" AS "StreetAddress",
+  "ActLotSize_ac" AS "LotSize(ac)",
+  "NumBldgs",
+  "LotTooSmall",
+  "ActLotSize_ac",
+  "AllowedLotSize_ac",
+  "BldgTooBig",
+  "ActBiggestBldg_sf",
+  "AllowedBldgFtprt_sf",
+  "ActBldgFtprt_pct",
+  "AllowedBldgFtprt_pct",
+  "CovTooBig",
+  "ActLotCoverage_sf",
+  "AllowedLotCoverage_sf",
+  "ActLotCoverage_pct",
+  "AllowedLotCoverage_pct",
+  "GFATooBig",
+  "ActGFA_sf",
+  "AllowedGFA_sf",
+  CASE
+    WHEN "ActFrontage_ft" < "AllowedFrontage_ft" THEN 1
+    ELSE 0
+  END AS "FrontageTooSmall",
+  "ActFrontage_ft",
+  "AllowedFrontage_ft"
+FROM
+  table_0
+ORDER BY
+  "ZoningDistrict"
+
+Sep 13, 2024 11:09:41 PM com.timestored.qstudio.model.QueryManager sendQuery
+INFO: run() sendingQuery: WITH table_7 AS (
+  SELECT
+    COUNT(*) AS "NumBldgs",
+    ROUND(
+      MAX(("BL_Gross_Floor_Area" * 1.0 / "BL_Stories")),
+      1
+    ) AS "ActBiggestBldg_sf",
+    COALESCE(SUM("BL_Gross_Floor_Area"), 0) AS "ActGFA_sf",
+    ROUND(
+      COALESCE(
+        SUM(("BL_Gross_Floor_Area" * 1.0 / "BL_Stories")),
+        0
+      ),
+      1
+    ) AS _expr_0,
+    "BL_PID"
+  FROM
+    buildings
+  GROUP BY
+    "BL_PID"
+),
+table_6 AS (
+  SELECT
+    sd."PID",
+    table_7."NumBldgs",
+    table_7."ActBiggestBldg_sf",
+    table_7."ActGFA_sf",
+    sd."Street_Address",
+    sd."EF_Frontage",
+    table_7._expr_0,
+    sd."Lot_Size",
+    CASE
+      WHEN sd."District" = 'ES' THEN 'RD'
+      WHEN sd."District" = 'R' THEN 'RD'
+      WHEN sd."District" = 'SFR' THEN 'RD'
+      WHEN sd."District" = 'URD' THEN 'RD'
+      WHEN sd."District" = 'LCD' THEN 'LCD'
+      WHEN sd."District" = 'CD' THEN 'LCD'
+      WHEN sd."District" = 'LDC' THEN 'LCD'
+      WHEN sd."District" = 'SD' THEN 'RD'
+      WHEN sd."District" = '' THEN 'Unknown'
+      ELSE sd."District"
+    END AS _expr_1,
+    sd."District"
+  FROM
+    table_7
+    JOIN "CleanScrapedData" AS sd ON table_7."BL_PID" = sd."PID"
+  WHERE
+    sd."Lot_Size" <> 0
+),
+table_5 AS (
+  SELECT
+    CASE
+      WHEN _expr_1 = 'LCD' THEN 'LymeCommon/Ctr'
+      WHEN _expr_1 = 'BD' THEN 'Commercial'
+      WHEN _expr_1 = 'RD'
+      AND CASE
+        WHEN "Street_Address" like '%' || 'ORFORD ' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DARTMOUTH COLLEGE' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DORCHESTER' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'THETFORD' || '%' THEN 1
+        ELSE 0
+      END = 1 THEN 'Rural-State Road'
+      WHEN _expr_1 = 'RD'
+      AND CASE
+        WHEN "Street_Address" like '%' || 'ORFORD ' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DARTMOUTH COLLEGE' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'DORCHESTER' || '%' THEN 1
+        WHEN "Street_Address" like '%' || 'THETFORD' || '%' THEN 1
+        ELSE 0
+      END = 0 THEN 'Rural-Town Road'
+      WHEN _expr_1 = 'ELD' THEN 'EastLyme'
+      WHEN _expr_1 = 'SKIWAY' THEN 'Skiway'
+      WHEN _expr_1 = 'MFD' THEN 'MtnForest'
+      ELSE _expr_1
+    END AS "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "ActBiggestBldg_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage",
+    _expr_0,
+    "Lot_Size",
+    _expr_1
+  FROM
+    table_6
+),
+table_4 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "Lot_Size" AS "ActLotSize_ac",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 1.0
+      WHEN "ZoningDistrict" = 'Commercial' THEN 2.0
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 3.0
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 5.0
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 15.0
+      WHEN "ZoningDistrict" = 'Skiway' THEN 2.0
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 50.0
+      ELSE '?'
+    END AS "AllowedLotSize_ac",
+    "ActBiggestBldg_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage",
+    _expr_0
+  FROM
+    table_5
+),
+table_3 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    CASE
+      WHEN "ActLotSize_ac" < "AllowedLotSize_ac" THEN 1
+      ELSE 0
+    END AS "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    "ActBiggestBldg_sf",
+    ROUND(
+      (
+        "ActLotSize_ac" * 43560 * CASE
+          WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 6.0
+          WHEN "ZoningDistrict" = 'Commercial' THEN 10.0
+          WHEN "ZoningDistrict" = 'Rural-State Road' THEN 2.0
+          WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 2.0
+          WHEN "ZoningDistrict" = 'EastLyme' THEN 1.0
+          WHEN "ZoningDistrict" = 'Skiway' THEN 1.0
+          WHEN "ZoningDistrict" = 'MtnForest' THEN 1.0
+          ELSE '?'
+        END * 1.0 / 100.0
+      ),
+      1
+    ) AS "AllowedBldgFtprt_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage",
+    _expr_0
+  FROM
+    table_4
+),
+table_2 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    CASE
+      WHEN "ActBiggestBldg_sf" > "AllowedBldgFtprt_sf" THEN 1
+      ELSE 0
+    END AS "BldgTooBig",
+    "ActBiggestBldg_sf",
+    "AllowedBldgFtprt_sf",
+    ROUND(
+      (
+        "ActBiggestBldg_sf" * 100.0 * 1.0 / (43560 * "ActLotSize_ac")
+      ),
+      1
+    ) AS "ActBldgFtprt_pct",
+    ROUND(
+      CASE
+        WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 6.0
+        WHEN "ZoningDistrict" = 'Commercial' THEN 10.0
+        WHEN "ZoningDistrict" = 'Rural-State Road' THEN 2.0
+        WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 2.0
+        WHEN "ZoningDistrict" = 'EastLyme' THEN 1.0
+        WHEN "ZoningDistrict" = 'Skiway' THEN 1.0
+        WHEN "ZoningDistrict" = 'MtnForest' THEN 1.0
+        ELSE '?'
+      END,
+      1
+    ) AS "AllowedBldgFtprt_pct",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN _expr_0 + 450
+      ELSE _expr_0
+    END AS "ActLotCoverage_sf",
+    ROUND(
+      (
+        "ActLotSize_ac" * 43560 * CASE
+          WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 12.0
+          WHEN "ZoningDistrict" = 'Commercial' THEN 20.0
+          WHEN "ZoningDistrict" = 'Rural-State Road' THEN 12.0
+          WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 12.0
+          WHEN "ZoningDistrict" = 'EastLyme' THEN 12.0
+          WHEN "ZoningDistrict" = 'Skiway' THEN 2.0
+          WHEN "ZoningDistrict" = 'MtnForest' THEN 2.0
+          ELSE '?'
+        END * 1.0 / 100.0
+      ),
+      1
+    ) AS "AllowedLotCoverage_sf",
+    "ActGFA_sf",
+    "Street_Address",
+    "EF_Frontage"
+  FROM
+    table_3
+),
+table_1 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    "BldgTooBig",
+    "ActBiggestBldg_sf",
+    "AllowedBldgFtprt_sf",
+    "ActBldgFtprt_pct",
+    "AllowedBldgFtprt_pct",
+    CASE
+      WHEN "ActLotCoverage_sf" > "AllowedLotCoverage_sf" THEN 1
+      ELSE 0
+    END AS "CovTooBig",
+    "ActLotCoverage_sf",
+    "AllowedLotCoverage_sf",
+    ROUND(
+      (
+        "ActLotCoverage_sf" * 100 * 1.0 / (43560 * "ActLotSize_ac")
+      ),
+      1
+    ) AS "ActLotCoverage_pct",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 12.0
+      WHEN "ZoningDistrict" = 'Commercial' THEN 20.0
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 12.0
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 12.0
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 12.0
+      WHEN "ZoningDistrict" = 'Skiway' THEN 2.0
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 2.0
+      ELSE '?'
+    END AS "AllowedLotCoverage_pct",
+    "ActGFA_sf",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 6000.0
+      WHEN "ZoningDistrict" = 'Commercial' THEN 14000.0
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 14000.0
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 14000.0
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 14000.0
+      WHEN "ZoningDistrict" = 'Skiway' THEN 14000.0
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 14000.0
+      ELSE '?'
+    END AS "AllowedGFA_sf",
+    "Street_Address",
+    "EF_Frontage"
+  FROM
+    table_2
+),
+table_0 AS (
+  SELECT
+    "ZoningDistrict",
+    "PID",
+    "NumBldgs",
+    "LotTooSmall",
+    "ActLotSize_ac",
+    "AllowedLotSize_ac",
+    "BldgTooBig",
+    "ActBiggestBldg_sf",
+    "AllowedBldgFtprt_sf",
+    "ActBldgFtprt_pct",
+    "AllowedBldgFtprt_pct",
+    "CovTooBig",
+    "ActLotCoverage_sf",
+    "AllowedLotCoverage_sf",
+    "ActLotCoverage_pct",
+    "AllowedLotCoverage_pct",
+    CASE
+      WHEN "ActGFA_sf" > "AllowedGFA_sf" THEN 1
+      ELSE 0
+    END AS "GFATooBig",
+    "ActGFA_sf",
+    "AllowedGFA_sf",
+    "EF_Frontage" AS "ActFrontage_ft",
+    CASE
+      WHEN "ZoningDistrict" = 'LymeCommon/Ctr' THEN 100
+      WHEN "ZoningDistrict" = 'Commercial' THEN 200
+      WHEN "ZoningDistrict" = 'Rural-State Road' THEN 300
+      WHEN "ZoningDistrict" = 'Rural-Town Road' THEN 300
+      WHEN "ZoningDistrict" = 'EastLyme' THEN 600
+      WHEN "ZoningDistrict" = 'Skiway' THEN 600
+      WHEN "ZoningDistrict" = 'MtnForest' THEN 1000
+      ELSE '?'
+    END AS "AllowedFrontage_ft",
+    "Street_Address"
+  FROM
+    table_1
+)
+SELECT
+  "ZoningDistrict",
+  "PID",
+  "Street_Address" AS "StreetAddress",
+  "ActLotSize_ac" AS "LotSize(ac)",
+  "NumBldgs",
+  "LotTooSmall",
+  "ActLotSize_ac",
+  "AllowedLotSize_ac",
+  "BldgTooBig",
+  "ActBiggestBldg_sf",
+  "AllowedBldgFtprt_sf",
+  "ActBldgFtprt_pct",
+  "AllowedBldgFtprt_pct",
+  "CovTooBig",
+  "ActLotCoverage_sf",
+  "AllowedLotCoverage_sf",
+  "ActLotCoverage_pct",
+  "AllowedLotCoverage_pct",
+  "GFATooBig",
+  "ActGFA_sf",
+  "AllowedGFA_sf",
+  CASE
+    WHEN "ActFrontage_ft" < "AllowedFrontage_ft" THEN 1
+    ELSE 0
+  END AS "FrontageTooSmall",
+  "ActFrontage_ft",
+  "AllowedFrontage_ft"
+FROM
+  table_0
+ORDER BY
+  "ZoningDistrict"
