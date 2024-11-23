@@ -3,7 +3,7 @@
 import googlemaps
 
 # Replace with your actual API key
-API_KEY = 'AIzaSyAws1xyApa3jvcSCdtl6B201Ed1Uo--VRM'
+API_KEY = 'get a real key'
 
 # Initialize the Google Maps client
 gmaps = googlemaps.Client(key=API_KEY)
