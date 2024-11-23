@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Created automatically by parse-lyme-minutes.py
+
+curl -L -o "Select_Board_Minutes_2024-10-17.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-381"
+curl -L -o "Select_Board_Minutes_2024-10-10.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-380"
+curl -L -o "Select_Board_Minutes_2024-09-05.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-378"
+curl -L -o "Select_Board_Minutes_2024-08-22.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-379"
+curl -L -o "Select_Board_Minutes_2024-08-08.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-377"
+curl -L -o "Select_Board_Minutes_2024-07-25.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-376"
+curl -L -o "Select_Board_Minutes_2024-07-11.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-375"
+curl -L -o "Select_Board_Minutes_2024-06-26.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-374"
+curl -L -o "Select_Board_Minutes_2024-06-13.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-368"
+curl -L -o "Select_Board_Minutes_2024-05-30.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-369"
+curl -L -o "Select_Board_Minutes_2024-05-22.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-373"
+curl -L -o "Select_Board_Minutes_2024-05-16.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-367"
+curl -L -o "Select_Board_Minutes_2024-05-02.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-372"
+curl -L -o "Select_Board_Minutes_2024-04-18.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-366"
+curl -L -o "Select_Board_Minutes_2024-04-04.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-371"
+curl -L -o "Select_Board_Minutes_2024-03-21.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-370"
+curl -L -o "Select_Board_Minutes_2024-03-07.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-365"
+curl -L -o "Select_Board_Minutes_2024-02-22.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-364"
+curl -L -o "Select_Board_Minutes_2024-02-08.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-363"
+curl -L -o "Select_Board_Minutes_2024-02-06.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-362"
+curl -L -o "Select_Board_Minutes_2024-01-25.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-361"
+curl -L -o "Select_Board_Minutes_2024-01-09.pdf" "https://www.lymenh.gov/select-board/minutes/select-board-minutes-360"
